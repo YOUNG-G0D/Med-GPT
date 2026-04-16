@@ -1,52 +1,48 @@
-# Live Performance Dashboard for Fine-Tuned Phi-3 Medical Model
+# 🩺 Med-GPT: Clinical AI Dashboard (Phi-3 Fine-Tuned)
 
-![Demo GIF](demo.gif)
+[![Hugging Face Space](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Space-blue)](https://huggingface.co/spaces/AMN04/Med-GPT)
+[![Model on Hub](https://img.shields.io/badge/%F0%9F%A4%97%20Model-AMN04%2Fphi3--medical--model-orange)](https://huggingface.co/AMN04/phi3-medical-model)
 
-This project is a high-performance web dashboard for interacting with a 4-bit quantized Phi-3 model, fine-tuned on a custom medical dataset. It provides real-time token generation and detailed performance metrics.
+This project features a **fine-tuned Phi-3-mini** model specialized for clinical inquiry and medical data analysis. The model has been optimized via **4-bit quantization** and is deployed as a live, streaming web application.
 
----
-
-## ⚠️ Model Download Required
-
-This repository contains the application code only. The fine-tuned model (2.2 GB) is hosted separately due to GitHub's file size limits.
-
-**You must download the model files and place them in this folder to run the project.**
+> **🚀 Live Demo:** [Click here to interact with Med-GPT on Hugging Face](https://huggingface.co/spaces/AMN04/Med-GPT)
 
 ---
 
-## 🛠️ Tech Stack
+## 🛠️ Technical Architecture
 
-* **Model:** Phi-3-mini (Fine-Tuned & 4-bit Quantized)
-* **ML Libraries:** PyTorch, Hugging Face `transformers`, `bitsandbytes`, `accelerate`
-* **Web Framework:** Streamlit
-* **Deployment:** GitHub (Code) + Google Drive (Model)
+To overcome hardware limitations and deployment constraints, this project utilizes a hybrid cloud architecture:
+
+* **Model Weights:** Hosted on Hugging Face Hub (`AMN04/phi3-medical-model`).
+* **Optimization:** **4-bit Quantization (bitsandbytes)** was employed to reduce the memory footprint from ~14GB to **2.3GB**, enabling inference on standard CPU environments.
+* **Inference Engine:** **Gradio SDK** with **Threaded Streaming (`TextIteratorStreamer`)**. This ensures words appear in real-time as they are processed, significantly improving user experience (UX) on CPU-bound instances.
+* **Fine-Tuning:** Specialized on medical datasets for clinical accuracy and professional medical tone.
+
+---
+
+## 📂 Project Structure
+
+* `app.py`: Production-grade Gradio application with threaded streaming logic.
+* `requirements.txt`: Minimal dependency list for cloud-based inference.
+* `quantization_config`: Integrated 4-bit loading protocol.
 
 ---
 
 ## 📂 How to Run Locally
 
-1.  **Clone the code repository:**
-    ```bash
-    git clone [https://github.com/YOUNG-G0D/phi3-medical-dashboard.git](https://github.com/YOUNG-G0D/phi3-medical-dashboard.git)
-    cd phi3-medical-dashboard
-    ```
+If you wish to run the inference locally on your own machine (Ubuntu/Windows):
 
-2.  **Download the Model (2.2 GB):**
-    * **[Click here to download the `model.zip` file](https://your-google-drive-share-link-goes-here)**
-    * Unzip the file. You will have a folder named `quantized_phi3_medical_model_4bit_FINAL`.
-    * **Go inside** that unzipped folder. **Copy all the files** from inside it (like `config.json`, `model.safetensors`, etc.).
-    * **Paste all of those files** into the `phi3-medical-dashboard` directory you cloned, right next to the `app.py` file.
+1. **Clone the repository:**
+   ```bash
+   git clone [https://github.com/YOUNG-G0D/Med-GPT.git](https://github.com/YOUNG-G0D/Med-GPT.git)
+   cd Med-GPT
+---
 
-3.  **Create the environment and install dependencies:**
-    ```bash
-    # (Recommended) Create a conda environment
-    conda create --name model_demo python=3.10
-    conda activate model_demo
-    
-    # Install dependencies
-    pip install -r requirements.txt
-    ```
+## 📂 How to Run Locally
 
-4.  **Run the Streamlit application:**
-    ```bash
-    streamlit run app.py
+If you wish to run the inference locally on your own machine (Ubuntu/Windows):
+
+1. **Clone the repository:**
+   ```bash
+   git clone [https://github.com/YOUNG-G0D/Med-GPT.git](https://github.com/YOUNG-G0D/Med-GPT.git)
+   cd Med-GPT
