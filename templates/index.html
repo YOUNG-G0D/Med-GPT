@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MED GPT | Clinical Terminal</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.4/socket.io.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@500&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0B0E14; --panel: #161B22; --text: #E6EDF3;
+            --accent: #00BFFF; --border: #30363D; --success: #3FB950;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text);
+            margin: 0; padding: 2rem; height: 100vh; overflow: hidden;
+        }
+        .grid-container {
+            display: grid; grid-template-columns: 1fr 2fr 1.2fr;
+            gap: 1.5rem; height: 100%;
+        }
+        .panel {
+            background: var(--panel); border-radius: 12px; border: 1px solid var(--border);
+            padding: 1.5rem; display: flex; flex-direction: column; overflow: hidden;
+        }
+        h2 { color: var(--accent); font-size: 0.85rem; margin-top: 0; text-transform: uppercase; letter-spacing: 1.5px; }
+        textarea {
+            width: 100%; height: 200px; background: #0D1117; border: 1px solid var(--border);
+            border-radius: 8px; color: #FFF; padding: 1.2rem; font-family: 'Roboto Mono';
+            font-size: 1rem; resize: none; outline: none; transition: 0.2s;
+        }
+        textarea:focus { border-color: var(--accent); }
+        #generate-btn {
+            background: var(--accent); color: #000; border: none; padding: 1rem;
+            border-radius: 8px; font-weight: 700; cursor: pointer; margin-top: 1rem;
+        }
+        #generate-btn:disabled { opacity: 0.3; }
+        #output-box {
+            flex-grow: 1; background: #0D1117; padding: 1.5rem; border-radius: 8px;
+            border: 1px solid var(--border); overflow-y: auto; white-space: pre-wrap;
+            font-size: 1.1rem; line-height: 1.6; color: #E6EDF3;
+        }
+        .metric-card {
+            background: #21262D; padding: 1.2rem; border-radius: 10px; margin-bottom: 1rem;
+            border-left: 4px solid var(--border);
+        }
+        .metric-card.live { border-left-color: var(--success); }
+        .label { font-size: 0.75rem; opacity: 0.5; margin-bottom: 5px; }
+        .value { font-family: 'Roboto Mono'; font-size: 1.8rem; font-weight: 700; }
+    </style>
+</head>
+<body>
+    <div class="grid-container">
+        <div class="panel">
+            <h2>Medical Query</h2>
+            <textarea id="prompt-input" placeholder="Enter query (e.g. Symptoms of Malaria)"></textarea>
+            <button id="generate-btn">RUN INFERENCE</button>
+        </div>
+
+        <div class="panel">
+            <h2>MED GPT Analysis</h2>
+            <div id="output-box"></div>
+        </div>
+
+        <div class="panel">
+            <h2>Metrics Dashboard</h2>
+            <div class="metric-card" id="c1"><div class="label">Latency (TTFT)</div><div class="value" id="ttft">-.--s</div></div>
+            <div class="metric-card" id="c2"><div class="label">Tokens/Sec</div><div class="value" id="tps">-.--</div></div>
+            <div class="metric-card" id="c3"><div class="label">Total Compute</div><div class="value" id="time">-.--s</div></div>
+        </div>
+    </div>
+
+    <script>
+        const socket = io();
+        const btn = document.getElementById('generate-btn');
+        const input = document.getElementById('prompt-input');
+        const output = document.getElementById('output-box');
+
+        let start;
+
+        // ENTER KEY LOGIC
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                btn.click();
+            }
+        });
+
+        btn.onclick = () => {
+            const query = input.value.trim();
+            if(!query || btn.disabled) return;
+            
+            output.innerText = '';
+            btn.disabled = true;
+            btn.innerText = 'PROCESSING...';
+            document.querySelectorAll('.metric-card').forEach(c => c.classList.remove('live'));
+            
+            start = performance.now();
+            socket.emit('generate_text', {prompt: query});
+        };
+
+        socket.on('stream_start', () => {
+            const ttft = (performance.now() - start) / 1000;
+            document.getElementById('ttft').innerText = ttft.toFixed(2) + 's';
+            document.getElementById('c1').classList.add('live');
+        });
+
+        socket.on('stream_token', (data) => {
+            output.innerText += data.token;
+            document.getElementById('tps').innerText = data.tokens_per_sec;
+            document.getElementById('c2').classList.add('live');
+            output.scrollTop = output.scrollHeight;
+        });
+
+        socket.on('stream_end', (data) => {
+            document.getElementById('time').innerText = data.total_time + 's';
+            document.getElementById('c3').classList.add('live');
+            btn.disabled = false;
+            btn.innerText = 'RUN INFERENCE';
+            input.focus();
+        });
+    </script>
+</body>
+</html>

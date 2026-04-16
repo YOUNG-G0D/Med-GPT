@@ -1,0 +1,18 @@
+# Ignore Python virtual environments
+myenv/
+venv/
+env/
+
+# Ignore cached Python files
+__pycache__/
+*.pyc
+
+# Ignore your local 2.3GB model weights (they live on Hugging Face now)
+quantized_phi3_medical_model_4bit_FINAL/
+*.safetensors
+*.bin
+*.pth
+
+# Ignore OS specific files
+.DS_Store
+.ipynb_checkpoints/
