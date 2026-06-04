@@ -37,12 +37,3 @@ If you wish to run the inference locally on your own machine (Ubuntu/Windows):
    git clone [https://github.com/YOUNG-G0D/Med-GPT.git](https://github.com/YOUNG-G0D/Med-GPT.git)
    cd Med-GPT
 ---
-
-## 📂 How to Run Locally
-
-If you wish to run the inference locally on your own machine (Ubuntu/Windows):
-
-1. **Clone the repository:**
-   ```bash
-   git clone [https://github.com/YOUNG-G0D/Med-GPT.git](https://github.com/YOUNG-G0D/Med-GPT.git)
-   cd Med-GPT
